@@ -1,0 +1,27 @@
+{
+  "modality": "clinical",
+  "model_type": "LogisticRegression",
+  "performance_metrics": {
+    "cv_auc": 0.7730794270833332,
+    "test_auc": 0.7858333333333333,
+    "sensitivity": 0.725,
+    "specificity": 0.7166666666666667
+  },
+  "feature_names": [
+    "age",
+    "gender_encoded",
+    "bmi",
+    "education_years",
+    "smoking_history",
+    "family_history",
+    "hypertension",
+    "diabetes"
+  ],
+  "clinical_thresholds": {
+    "high_sensitivity": 0.3,
+    "balanced": 0.5,
+    "high_specificity": 0.7
+  },
+  "training_date": "20250927_174031",
+  "validation_method": "stratified_5_fold_cv"
+}

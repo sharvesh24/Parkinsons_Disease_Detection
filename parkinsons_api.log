@@ -1,0 +1,66 @@
+2025-09-28 17:05:28,917 - __main__ - INFO - Database initialized successfully
+2025-09-28 17:05:28,968 - __main__ - INFO - Random Forest model loaded successfully
+2025-09-28 17:05:29,023 - __main__ - INFO - Scaler loaded successfully
+2025-09-28 17:05:29,037 - __main__ - INFO - PCA model loaded successfully
+2025-09-28 17:05:29,860 - absl - WARNING - Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+2025-09-28 17:05:29,900 - __main__ - INFO - CNN model loaded successfully from models\parkinson_cnn_model.h5
+2025-09-28 17:05:29,901 - __main__ - INFO - All available models loaded successfully
+2025-09-28 17:05:29,912 - __main__ - INFO - Starting Enhanced Parkinson's Disease Prediction API Server...
+2025-09-28 17:05:29,913 - __main__ - INFO - ================================================================================
+2025-09-28 17:05:29,921 - __main__ - INFO - ================================================================================
+2025-09-28 17:05:29,921 - __main__ - INFO - Available endpoints:
+2025-09-28 17:05:29,942 - __main__ - INFO - ================================================================================
+2025-09-28 17:05:29,944 - __main__ - INFO -   • Rate limiting (100 requests/hour)
+2025-09-28 17:05:29,945 - __main__ - INFO -   • Request validation and sanitization
+2025-09-28 17:05:29,945 - __main__ - INFO -   • Comprehensive error handling
+2025-09-28 17:05:29,945 - __main__ - INFO -   • Medical disclaimers and warnings
+2025-09-28 17:05:29,945 - __main__ - INFO - ================================================================================
+2025-09-28 17:05:29,947 - __main__ - INFO -    This tool provides screening assessments only.
+2025-09-28 17:05:29,947 - __main__ - INFO -    Results are NOT medical diagnoses.
+2025-09-28 17:05:29,948 - __main__ - INFO -    Consult healthcare professionals for medical decisions.
+2025-09-28 17:05:29,948 - __main__ - INFO - ================================================================================
+2025-09-28 17:05:29,989 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.5:5000
+2025-09-28 17:05:29,990 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-28 17:08:37,238 - __main__ - INFO - Database initialized successfully
+2025-09-28 17:08:37,320 - __main__ - INFO - Random Forest model loaded successfully
+2025-09-28 17:08:37,322 - __main__ - INFO - Scaler loaded successfully
+2025-09-28 17:08:37,323 - __main__ - INFO - PCA model loaded successfully
+2025-09-28 17:08:37,791 - absl - WARNING - Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+2025-09-28 17:08:37,809 - __main__ - INFO - CNN model loaded successfully from models\parkinson_cnn_model.h5
+2025-09-28 17:08:37,811 - __main__ - INFO - All available models loaded successfully
+2025-09-28 17:08:37,825 - __main__ - INFO - Starting Enhanced Parkinson's Disease Prediction API Server...
+2025-09-28 17:08:37,825 - __main__ - INFO - ================================================================================
+2025-09-28 17:08:37,826 - __main__ - INFO - MEDICAL SCREENING TOOL - FOR RESEARCH AND EDUCATIONAL USE ONLY
+2025-09-28 17:08:37,826 - __main__ - INFO - ================================================================================
+2025-09-28 17:08:37,826 - __main__ - INFO - Available endpoints:
+2025-09-28 17:08:37,826 - __main__ - INFO - POST /api/analyze-voice       - Voice pattern analysis
+2025-09-28 17:08:37,827 - __main__ - INFO - POST /api/analyze-drawings   - Motor control assessment
+2025-09-28 17:08:37,827 - __main__ - INFO - POST /api/analyze-signal      - Clinical risk assessment
+2025-09-28 17:08:37,827 - __main__ - INFO - POST /api/analyze-combined    - Ensemble prediction
+2025-09-28 17:08:37,828 - __main__ - INFO - POST /api/generate-report     - Generate PDF report
+2025-09-28 17:08:37,828 - __main__ - INFO - GET  /api/download-report/<id> - Download report
+2025-09-28 17:08:37,829 - __main__ - INFO - GET  /api/system-stats        - System statistics
+2025-09-28 17:08:37,829 - __main__ - INFO - GET  /api/health             - Health check
+2025-09-28 17:08:37,830 - __main__ - INFO - ================================================================================
+2025-09-28 17:08:37,830 - __main__ - INFO - Security features enabled:
+2025-09-28 17:08:37,830 - __main__ - INFO -   • Rate limiting (100 requests/hour)
+2025-09-28 17:08:37,831 - __main__ - INFO -   • Request validation and sanitization
+2025-09-28 17:08:37,831 - __main__ - INFO -   • Comprehensive error handling
+2025-09-28 17:08:37,831 - __main__ - INFO -   • Medical disclaimers and warnings
+2025-09-28 17:08:37,832 - __main__ - INFO - ================================================================================
+2025-09-28 17:08:37,832 - __main__ - INFO - IMPORTANT MEDICAL DISCLAIMER:
+2025-09-28 17:08:37,832 - __main__ - INFO -    This tool provides screening assessments only.
+2025-09-28 17:08:37,833 - __main__ - INFO -    Results are NOT medical diagnoses.
+2025-09-28 17:08:37,833 - __main__ - INFO -    Consult healthcare professionals for medical decisions.
+2025-09-28 17:08:37,833 - __main__ - INFO - ================================================================================
+2025-09-28 17:08:37,834 - __main__ - INFO - 
+ Server starting on http://localhost:5000
+2025-09-28 17:08:37,881 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.5:5000
+2025-09-28 17:08:37,882 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-09-28 17:14:43,582 - werkzeug - INFO - 127.0.0.1 - - [28/Sep/2025 17:14:43] "[31m[1mPOST /api/analyze-voice HTTP/1.1[0m" 400 -

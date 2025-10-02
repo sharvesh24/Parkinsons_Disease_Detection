@@ -1,0 +1,42 @@
+2025-09-28 17:06:42,454 - __main__ - INFO - Database initialized successfully
+2025-09-28 17:06:42,513 - __main__ - INFO - Random Forest model loaded successfully
+2025-09-28 17:06:42,529 - __main__ - INFO - Scaler loaded successfully
+2025-09-28 17:06:42,550 - __main__ - INFO - PCA model loaded successfully
+2025-09-28 17:06:43,206 - absl - WARNING - Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+2025-09-28 17:06:43,276 - __main__ - INFO - CNN model loaded successfully from models\parkinson_cnn_model.h5
+2025-09-28 17:06:43,277 - __main__ - INFO - All available models loaded successfully
+2025-09-28 17:06:43,288 - __main__ - INFO - Starting Enhanced Parkinson's Disease Prediction API Server...
+2025-09-28 17:06:43,289 - __main__ - INFO - ================================================================================
+2025-09-28 17:06:43,295 - __main__ - INFO - ================================================================================
+2025-09-28 17:06:43,296 - __main__ - INFO - Available endpoints:
+2025-09-28 17:06:43,332 - __main__ - INFO - ================================================================================
+2025-09-28 17:06:43,335 - __main__ - INFO -   • Rate limiting (100 requests/hour)
+2025-09-28 17:06:43,336 - __main__ - INFO -   • Request validation and sanitization
+2025-09-28 17:06:43,336 - __main__ - INFO -   • Comprehensive error handling
+2025-09-28 17:06:43,337 - __main__ - INFO -   • Medical disclaimers and warnings
+2025-09-28 17:06:43,337 - __main__ - INFO - ================================================================================
+2025-09-28 17:06:43,341 - __main__ - INFO -    This tool provides screening assessments only.
+2025-09-28 17:06:43,342 - __main__ - INFO -    Results are NOT medical diagnoses.
+2025-09-28 17:06:43,343 - __main__ - INFO -    Consult healthcare professionals for medical decisions.
+2025-09-28 17:06:43,343 - __main__ - INFO - ================================================================================
+2025-09-28 17:06:43,392 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.5:5000
+2025-09-28 17:06:43,393 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-10-02 11:27:26,646 - __main__ - INFO - Database initialized
+2025-10-02 11:27:29,446 - __main__ - INFO - RF model loaded
+2025-10-02 11:27:32,474 - absl - WARNING - Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+2025-10-02 11:27:33,039 - __main__ - INFO - CNN model loaded
+2025-10-02 11:27:33,039 - __main__ - INFO - Models loaded successfully
+2025-10-02 11:27:33,045 - __main__ - INFO - Starting Parkinson's Detection API...
+2025-10-02 11:27:33,045 - __main__ - INFO - Endpoints: /api/health, /api/analyze-drawings, /api/analyze-clinical
+2025-10-02 11:27:33,046 - __main__ - INFO -           /api/analyze-combined, /api/generate-report
+2025-10-02 11:27:33,046 - __main__ - INFO -           /api/download-report/<id>, /api/export-data/<id>
+2025-10-02 11:27:33,046 - __main__ - INFO -           /api/export-all, /api/stats
+2025-10-02 11:27:33,047 - __main__ - INFO - MEDICAL DISCLAIMER: For research purposes only
+2025-10-02 11:27:33,112 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.8:5000
+2025-10-02 11:27:33,113 - werkzeug - INFO - [33mPress CTRL+C to quit[0m

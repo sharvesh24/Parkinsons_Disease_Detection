@@ -1,0 +1,36 @@
+{
+  "modality": "motor",
+  "model_type": "RandomForestClassifier",
+  "performance_metrics": {
+    "cv_auc": 1.0,
+    "test_auc": 1.0,
+    "sensitivity": 1.0,
+    "specificity": 1.0
+  },
+  "feature_names": [
+    "velocity_mean",
+    "velocity_std",
+    "velocity_cv",
+    "velocity_max",
+    "velocity_min",
+    "acceleration_mean",
+    "acceleration_std",
+    "acceleration_max",
+    "jerk_mean",
+    "jerk_std",
+    "jerk_cv",
+    "tremor_power",
+    "tremor_frequency",
+    "movement_smoothness",
+    "movement_speed",
+    "drawing_accuracy",
+    "pause_frequency"
+  ],
+  "clinical_thresholds": {
+    "high_sensitivity": 0.3,
+    "balanced": 0.5,
+    "high_specificity": 0.7
+  },
+  "training_date": "20250927_174031",
+  "validation_method": "stratified_5_fold_cv"
+}
