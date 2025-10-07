@@ -39,9 +39,13 @@ env/
 .DS_Store
 Thumbs.db
 
-# Uploads
-uploads/
-temp/
+# Application specific
+parkinsons_api.log
+parkinsons_assessments.db
+generated_reports/*.pdf
+temp_files/*
+!temp_files/.gitkeep
+!generated_reports/.gitkeep
 
 # Environment variables
 .env
@@ -50,7 +54,8 @@ temp/
 # Logs
 *.log
 
-# Model files (if too large)
-# *.pkl
-# *.h5
-# *.joblib
+# Model files (if too large for git, use Git LFS instead)
+# Uncomment if models are > 100MB
+# models/*.pkl
+# models/*.h5
+# models/*.keras
