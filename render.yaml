@@ -2,6 +2,7 @@ services:
   - type: web
     name: parkinsons-detection-api
     env: python
+    runtime: python
     region: oregon
     plan: free
     rootDir: backend
@@ -9,5 +10,4 @@ services:
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.5
-    healthCheckPath: /api/health
+        value: "3.11"
