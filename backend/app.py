@@ -168,101 +168,101 @@ class ParkinsonPredictor:
         self.load_models()
     
     def load_models(self):
-    """Load ML models with correct filenames"""
-    global models
-    try:
-        os.makedirs(Config.MODELS_DIR, exist_ok=True)
-        
-        # Load Random Forest model - CHECK EXACT FILENAME IN YOUR REPO
-        rf_paths = [
-            os.path.join(Config.MODELS_DIR, 'parkinson_rf_model.pkl'),
-            os.path.join(Config.MODELS_DIR, 'rf_model.pkl'),
-            os.path.join(Config.MODELS_DIR, 'random_forest_model.pkl')
-        ]
-        
-        for rf_path in rf_paths:
-            if os.path.exists(rf_path):
-                try:
-                    models['rf_model'] = joblib.load(rf_path)
-                    logger.info(f"✓ RF model loaded from: {rf_path}")
-                    break
-                except Exception as e:
-                    logger.warning(f"Failed to load RF from {rf_path}: {e}")
-        
-        if models['rf_model'] is None:
-            logger.warning("⚠ RF model not found. Available files:")
-            if os.path.exists(Config.MODELS_DIR):
-                for file in os.listdir(Config.MODELS_DIR):
-                    logger.info(f"  - {file}")
-        
-        # Load Scaler
-        scaler_paths = [
-            os.path.join(Config.MODELS_DIR, 'scaler.pkl'),
-            os.path.join(Config.MODELS_DIR, 'standard_scaler.pkl')
-        ]
-        
-        for scaler_path in scaler_paths:
-            if os.path.exists(scaler_path):
-                try:
-                    models['scaler'] = joblib.load(scaler_path)
-                    logger.info(f"✓ Scaler loaded from: {scaler_path}")
-                    break
-                except Exception as e:
-                    logger.warning(f"Failed to load scaler from {scaler_path}: {e}")
-        
-        # Load PCA
-        pca_paths = [
-            os.path.join(Config.MODELS_DIR, 'pca.pkl'),
-            os.path.join(Config.MODELS_DIR, 'pca_model.pkl')
-        ]
-        
-        for pca_path in pca_paths:
-            if os.path.exists(pca_path):
-                try:
-                    models['pca'] = joblib.load(pca_path)
-                    logger.info(f"✓ PCA loaded from: {pca_path}")
-                    break
-                except Exception as e:
-                    logger.warning(f"Failed to load PCA from {pca_path}: {e}")
-        
-        # Load CNN model - TRY MULTIPLE FORMATS
-        cnn_paths = [
-            os.path.join(Config.MODELS_DIR, 'parkinson_cnn_model.h5'),
-            os.path.join(Config.MODELS_DIR, 'parkinson_cnn_model.keras'),
-            os.path.join(Config.MODELS_DIR, 'cnn_model.h5'),
-            os.path.join(Config.MODELS_DIR, 'cnn_model.keras'),
-            os.path.join(Config.MODELS_DIR, 'model.h5'),
-            os.path.join(Config.MODELS_DIR, 'model.keras')
-        ]
-        
-        for cnn_path in cnn_paths:
-            if os.path.exists(cnn_path):
-                try:
-                    models['cnn_model'] = tf.keras.models.load_model(cnn_path, compile=False)
-                    logger.info(f"✓ CNN model loaded from: {cnn_path}")
-                    break
-                except Exception as e:
-                    logger.warning(f"Failed to load CNN from {cnn_path}: {e}")
-                    traceback.print_exc()
-        
-        if models['cnn_model'] is None:
-            logger.warning("⚠ CNN model not found or failed to load")
-        
-        self.models_loaded = True
-        
-        # Log final status
-        logger.info("=" * 50)
-        logger.info("MODEL LOADING SUMMARY:")
-        logger.info(f"  RF Model: {'✓ LOADED' if models['rf_model'] else '✗ NOT LOADED'}")
-        logger.info(f"  Scaler:   {'✓ LOADED' if models['scaler'] else '✗ NOT LOADED'}")
-        logger.info(f"  PCA:      {'✓ LOADED' if models['pca'] else '✗ NOT LOADED'}")
-        logger.info(f"  CNN Model:{'✓ LOADED' if models['cnn_model'] else '✗ NOT LOADED'}")
-        logger.info("=" * 50)
-        
-    except Exception as e:
-        logger.error(f"Critical model loading error: {e}")
-        traceback.print_exc()
-        self.models_loaded = False
+        """Load ML models with correct filenames"""  # ← FIXED INDENTATION
+        global models
+        try:
+            os.makedirs(Config.MODELS_DIR, exist_ok=True)
+            
+            # Load Random Forest model
+            rf_paths = [
+                os.path.join(Config.MODELS_DIR, 'parkinson_rf_model.pkl'),
+                os.path.join(Config.MODELS_DIR, 'rf_model.pkl'),
+                os.path.join(Config.MODELS_DIR, 'random_forest_model.pkl')
+            ]
+            
+            for rf_path in rf_paths:
+                if os.path.exists(rf_path):
+                    try:
+                        models['rf_model'] = joblib.load(rf_path)
+                        logger.info(f"✓ RF model loaded from: {rf_path}")
+                        break
+                    except Exception as e:
+                        logger.warning(f"Failed to load RF from {rf_path}: {e}")
+            
+            if models['rf_model'] is None:
+                logger.warning("⚠ RF model not found. Available files:")
+                if os.path.exists(Config.MODELS_DIR):
+                    for file in os.listdir(Config.MODELS_DIR):
+                        logger.info(f"  - {file}")
+            
+            # Load Scaler
+            scaler_paths = [
+                os.path.join(Config.MODELS_DIR, 'scaler.pkl'),
+                os.path.join(Config.MODELS_DIR, 'standard_scaler.pkl')
+            ]
+            
+            for scaler_path in scaler_paths:
+                if os.path.exists(scaler_path):
+                    try:
+                        models['scaler'] = joblib.load(scaler_path)
+                        logger.info(f"✓ Scaler loaded from: {scaler_path}")
+                        break
+                    except Exception as e:
+                        logger.warning(f"Failed to load scaler from {scaler_path}: {e}")
+            
+            # Load PCA
+            pca_paths = [
+                os.path.join(Config.MODELS_DIR, 'pca.pkl'),
+                os.path.join(Config.MODELS_DIR, 'pca_model.pkl')
+            ]
+            
+            for pca_path in pca_paths:
+                if os.path.exists(pca_path):
+                    try:
+                        models['pca'] = joblib.load(pca_path)
+                        logger.info(f"✓ PCA loaded from: {pca_path}")
+                        break
+                    except Exception as e:
+                        logger.warning(f"Failed to load PCA from {pca_path}: {e}")
+            
+            # Load CNN model - TRY MULTIPLE FORMATS
+            cnn_paths = [
+                os.path.join(Config.MODELS_DIR, 'parkinson_cnn_model.h5'),
+                os.path.join(Config.MODELS_DIR, 'parkinson_cnn_model.keras'),
+                os.path.join(Config.MODELS_DIR, 'cnn_model.h5'),
+                os.path.join(Config.MODELS_DIR, 'cnn_model.keras'),
+                os.path.join(Config.MODELS_DIR, 'model.h5'),
+                os.path.join(Config.MODELS_DIR, 'model.keras')
+            ]
+            
+            for cnn_path in cnn_paths:
+                if os.path.exists(cnn_path):
+                    try:
+                        models['cnn_model'] = tf.keras.models.load_model(cnn_path, compile=False)
+                        logger.info(f"✓ CNN model loaded from: {cnn_path}")
+                        break
+                    except Exception as e:
+                        logger.warning(f"Failed to load CNN from {cnn_path}: {e}")
+                        traceback.print_exc()
+            
+            if models['cnn_model'] is None:
+                logger.warning("⚠ CNN model not found or failed to load")
+            
+            self.models_loaded = True
+            
+            # Log final status
+            logger.info("=" * 50)
+            logger.info("MODEL LOADING SUMMARY:")
+            logger.info(f"  RF Model: {'✓ LOADED' if models['rf_model'] else '✗ NOT LOADED'}")
+            logger.info(f"  Scaler:   {'✓ LOADED' if models['scaler'] else '✗ NOT LOADED'}")
+            logger.info(f"  PCA:      {'✓ LOADED' if models['pca'] else '✗ NOT LOADED'}")
+            logger.info(f"  CNN Model:{'✓ LOADED' if models['cnn_model'] else '✗ NOT LOADED'}")
+            logger.info("=" * 50)
+            
+        except Exception as e:
+            logger.error(f"Critical model loading error: {e}")
+            traceback.print_exc()
+            self.models_loaded = False
     
     def extract_drawing_features(self, coordinates_dict):
         features = []
