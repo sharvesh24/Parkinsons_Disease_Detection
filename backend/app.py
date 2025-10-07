@@ -51,7 +51,6 @@ app = Flask(__name__)
 CORS(app)
 
 class Config:
-    class Config:
     DATABASE_PATH = os.path.join(BASE_DIR, 'parkinsons_assessments.db')
     REPORTS_DIR = os.path.join(BASE_DIR, 'generated_reports')
     MODELS_DIR = os.path.join(BASE_DIR, 'models')
