@@ -141,7 +141,7 @@ const ParkinsonsApp = () => {
   
     try {
     // YOUR RENDER BACKEND URL
-      const API_URL = 'https://your-render-app.onrender.com';
+      const API_URL = 'https://parkinsons-detection-api-ljeo.onrender.com';
     
     // 1. Analyze drawings
       const drawingResponse = await fetch(`${API_URL}/api/analyze-drawings`, {
