@@ -32,6 +32,9 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 
+PORT = int(os.environ.get('PORT', 5000))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 warnings.filterwarnings('ignore')
 
 logging.basicConfig(
@@ -48,10 +51,11 @@ app = Flask(__name__)
 CORS(app)
 
 class Config:
-    DATABASE_PATH = 'parkinsons_assessments.db'
-    REPORTS_DIR = 'generated_reports'
-    MODELS_DIR = 'models'
-    TEMP_DIR = 'temp_files'
+    class Config:
+    DATABASE_PATH = os.path.join(BASE_DIR, 'parkinsons_assessments.db')
+    REPORTS_DIR = os.path.join(BASE_DIR, 'generated_reports')
+    MODELS_DIR = os.path.join(BASE_DIR, 'models')
+    TEMP_DIR = os.path.join(BASE_DIR, 'temp_files')
     MAX_CONTENT_LENGTH = 50 * 1024 * 1024
     RATE_LIMIT_REQUESTS = 100
     RATE_LIMIT_WINDOW = 3600
