@@ -152,25 +152,41 @@ class DatabaseManager:
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
+            # Add missing columns with default None values
                 cursor.execute('''
-                    INSERT INTO assessments VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO assessments VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
-                    data.get('id'), data.get('timestamp'),
-                    data.get('patient_age'), data.get('patient_gender'),
-                    data.get('patient_weight'), data.get('patient_height'),
-                    data.get('patient_writing_hand'), data.get('patient_smoker'),
-                    data.get('drawing_prediction'), data.get('drawing_confidence'),
+                    data.get('id'), 
+                    data.get('timestamp'),
+                    data.get('patient_age'), 
+                    data.get('patient_gender'),
+                    data.get('patient_weight'), 
+                    data.get('patient_height'),
+                    data.get('patient_writing_hand'), 
+                    data.get('patient_smoker'),
+                    data.get('drawing_prediction'), 
+                    data.get('drawing_confidence'),
                     json.dumps(data.get('drawing_features', {})),
                     json.dumps(data.get('drawing_paths', {})),
-                    data.get('clinical_prediction'), data.get('clinical_confidence'),
+                    data.get('clinical_prediction'), 
+                    data.get('clinical_confidence'),
                     json.dumps(data.get('clinical_features', {})),
-                    data.get('combined_prediction'), data.get('combined_confidence'),
+                    data.get('combined_prediction'), 
+                    data.get('combined_confidence'),
                     json.dumps(data.get('ensemble_info', {})),
-                    data.get('report_path'), data.get('ip_address')
+                    data.get('report_path'), 
+                    data.get('ip_address'),
+                    None,  # Add 6 more None values for missing columns
+                    None,
+                    None,
+                    None,
+                    None,
+                    None
                 ))
                 conn.commit()
         except Exception as e:
             logger.error(f"Save error: {e}")
+            traceback.print_exc()
             raise
 
 class ParkinsonPredictor:
@@ -279,37 +295,42 @@ class ParkinsonPredictor:
     def extract_drawing_features(self, coordinates_dict):
         features = []
         pattern_quality = {}
-        
+    
         try:
             for pattern_name in ['circle', 'spiral', 'meander']:
                 coords = coordinates_dict.get(pattern_name, [])
                 pattern_features = []
-                
+            
                 if coords and len(coords) > 2:
-                    coords_array = np.array(coords)
+                    # FIX: Handle both {x, y} objects and [x, y] arrays
+                    if isinstance(coords[0], dict):
+                        coords_array = np.array([[c['x'], c['y']] for c in coords])
+                    else:
+                        coords_array = np.array(coords)
+                
                     x_coords, y_coords = coords_array[:, 0], coords_array[:, 1]
-                    
+                
                     pattern_features.extend([
                         np.mean(x_coords), np.mean(y_coords),
                         np.std(x_coords), np.std(y_coords),
                         np.ptp(x_coords), np.ptp(y_coords),
                         len(coords)
                     ])
-                    
+                
                     if len(coords_array) > 2:
                         velocity = np.diff(coords_array, axis=0)
                         velocity_mag = np.sqrt(np.sum(velocity**2, axis=1))
-                        
+                    
                         pattern_features.extend([
                             np.mean(velocity_mag), np.std(velocity_mag),
                             np.max(velocity_mag), np.min(velocity_mag)
                         ])
-                        
+                    
                         if len(velocity) > 1:
                             accel = np.diff(velocity, axis=0)
                             accel_mag = np.sqrt(np.sum(accel**2, axis=1))
                             pattern_features.extend([np.mean(accel_mag), np.std(accel_mag)])
-                            
+                        
                             if len(accel) > 1:
                                 jerk = np.diff(accel, axis=0)
                                 jerk_mag = np.sqrt(np.sum(jerk**2, axis=1))
@@ -318,7 +339,7 @@ class ParkinsonPredictor:
                                 pattern_features.extend([0, 0])
                         else:
                             pattern_features.extend([0, 0, 0, 0])
-                        
+                    
                         pattern_quality[pattern_name] = {
                             'completeness': min(1.0, len(coords) / 50),
                             'smoothness': 1 - min(1, np.std(velocity_mag) / max(np.mean(velocity_mag), 0.01))
@@ -329,22 +350,23 @@ class ParkinsonPredictor:
                 else:
                     pattern_features.extend([0] * 15)
                     pattern_quality[pattern_name] = {'completeness': 0, 'smoothness': 0}
-                
-                features.extend(pattern_features)
             
+                features.extend(pattern_features)
+        
             target_size = 60
             if len(features) < target_size:
                 features.extend([0.0] * (target_size - len(features)))
             else:
                 features = features[:target_size]
-            
+        
             features = [float(f) if np.isfinite(f) else 0.0 for f in features]
         except Exception as e:
             logger.error(f"Feature extraction error: {e}")
+            traceback.print_exc()  # Add full traceback
             features = [0.0] * 60
             pattern_quality = {'circle': {'completeness': 0}, 'spiral': {'completeness': 0}, 
                              'meander': {'completeness': 0}}
-        
+    
         return np.array(features).reshape(1, -1), pattern_quality
     
     def analyze_drawings(self, coordinates_dict):
