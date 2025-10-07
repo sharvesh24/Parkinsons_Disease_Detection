@@ -48,7 +48,19 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={
+    r"/api/*": {
+        "origins": [
+            "http://localhost:3000",  # Local React dev
+            "http://localhost:5173",  # Local Vite dev
+            "https://your-frontend.vercel.app",  # Your deployed frontend
+            "*"  # Allow all (remove in production for security)
+        ],
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
+    }
+})
 
 class Config:
     DATABASE_PATH = os.path.join(BASE_DIR, 'parkinsons_assessments.db')
@@ -541,6 +553,29 @@ predictor = ParkinsonPredictor(db_manager)
 
 for directory in [Config.REPORTS_DIR, Config.TEMP_DIR, Config.MODELS_DIR]:
     os.makedirs(directory, exist_ok=True)
+# Add this BEFORE the /api/health endpoint in app.py:
+
+@app.route('/', methods=['GET'])
+def index():
+    """Root endpoint - API documentation"""
+    return jsonify({
+        'message': 'Parkinson\'s Disease Detection API',
+        'version': '1.0.0',
+        'status': 'running',
+        'endpoints': {
+            'health': '/api/health',
+            'analyze_drawings': '/api/analyze-drawings [POST]',
+            'analyze_clinical': '/api/analyze-clinical [POST]',
+            'analyze_combined': '/api/analyze-combined [POST]',
+            'generate_report': '/api/generate-report [POST]',
+            'download_report': '/api/download-report/<id> [GET]',
+            'export_data': '/api/export-data/<id> [GET]',
+            'export_all': '/api/export-all [GET]',
+            'stats': '/api/stats [GET]'
+        },
+        'docs': 'https://github.com/sharvesh24/Parkinsons_Disease_Detection',
+        'disclaimer': Config.MEDICAL_DISCLAIMER
+    })
 
 @app.route('/api/health', methods=['GET'])
 @rate_limit
