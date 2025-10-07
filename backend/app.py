@@ -53,7 +53,7 @@ CORS(app, resources={
         "origins": [
             "http://localhost:3000",  # Local React dev
             "http://localhost:5173",  # Local Vite dev
-            "https://your-frontend.vercel.app",  # Your deployed frontend
+            "https://parkinsons-disease-detection.vercel.app",  # Your deployed frontend
             "*"  # Allow all (remove in production for security)
         ],
         "methods": ["GET", "POST", "OPTIONS"],
