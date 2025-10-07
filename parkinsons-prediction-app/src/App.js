@@ -138,27 +138,59 @@ const ParkinsonsApp = () => {
 
   const analyzeData = async () => {
     setIsAnalyzing(true);
+  
+    try {
+    // YOUR RENDER BACKEND URL
+      const API_URL = 'https://your-render-app.onrender.com';
     
-    setTimeout(() => {
-      const drawingScore = 0.65 + Math.random() * 0.25;
-      const clinicalScore = 0.60 + Math.random() * 0.30;
-      const combined = (drawingScore + clinicalScore) / 2;
-      
+    // 1. Analyze drawings
+      const drawingResponse = await fetch(`${API_URL}/api/analyze-drawings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(drawingPaths)
+      });
+      const drawingResult = await drawingResponse.json();
+    
+    // 2. Analyze clinical data
+      const clinicalResponse = await fetch(`${API_URL}/api/analyze-clinical`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patientData)
+      });
+      const clinicalResult = await clinicalResponse.json();
+    
+    // 3. Get combined analysis
+      const combinedResponse = await fetch(`${API_URL}/api/analyze-combined`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          drawingPrediction: drawingResult,
+          clinicalPrediction: clinicalResult
+        })
+      });
+      const combinedResult = await combinedResponse.json();
+    
+      // Use real results
       const newAssessment = {
-        id: Date.now().toString(),
+        id: combinedResult.assessment_id,
         date: new Date().toISOString(),
-        result: combined > 0.7 ? 1 : 0,
-        confidence: combined,
-        drawingScore: drawingScore,
-        clinicalScore: clinicalScore,
+        result: combinedResult.result,
+        confidence: combinedResult.confidence,
+        drawingScore: drawingResult.confidence,
+        clinicalScore: clinicalResult.confidence,
         patientData: { ...patientData }
       };
-
+    
       setResults(newAssessment);
       setAssessmentHistory(prev => [newAssessment, ...prev]);
-      setIsAnalyzing(false);
       setScreen('results');
-    }, 2500);
+    
+    } catch (error) {
+      console.error('API Error:', error);
+      alert('Failed to analyze. Please check your connection.');
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const generatePDF = async (assessment) => {
