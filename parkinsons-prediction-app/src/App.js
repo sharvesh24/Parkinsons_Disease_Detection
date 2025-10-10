@@ -329,7 +329,7 @@ const ParkinsonsApp = () => {
             >
               <Menu size={24} />
             </button>
-            <h1 style={{ margin: 0, fontSize: '18px', fontWeight: '700' }}>NeuroCheck</h1>
+            <h1 style={{ margin: 0, fontSize: '18px', fontWeight: '700' }}>NeuroMate</h1>
             <button
               onClick={() => setDarkMode(!darkMode)}
               style={{
@@ -1492,7 +1492,7 @@ const ParkinsonsApp = () => {
               }}>
                 <Activity size={40} color={theme.primary} />
               </div>
-              <h2 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '8px' }}>NeuroCheck</h2>
+              <h2 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '8px' }}>NeuroMate</h2>
               <p style={{ color: theme.textSecondary, fontSize: '14px' }}>Version 1.0.0</p>
             </div>
 
