@@ -132,66 +132,81 @@ const ParkinsonsApp = () => {
     return Object.values(drawingPaths).filter(path => path.length > 0).length;
   };
 
-  const canAnalyze = () => {
-    return getCompletedPatterns() > 0 && patientData.age && patientData.gender;
-  };
-
   const analyzeData = async () => {
-    setIsAnalyzing(true);
+  console.log('🟢 analyzeData function called!');
+  console.log('Can analyze?', canAnalyze());
+  console.log('Drawing paths:', drawingPaths);
+  console.log('Patient data:', patientData);
   
-    try {
-    // YOUR RENDER BACKEND URL
-      const API_URL = 'https://parkinsons-detection-api-ljeo.onrender.com';
+  setIsAnalyzing(true);
+  
+  try {
+    const API_URL = 'https://parkinsons-detection-api-ljeo.onrender.com';
+    console.log('🔵 Starting API calls to:', API_URL);
     
     // 1. Analyze drawings
-      const drawingResponse = await fetch(`${API_URL}/api/analyze-drawings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(drawingPaths)
-      });
-      const drawingResult = await drawingResponse.json();
+    console.log('📤 Sending drawing data...');
+    const drawingResponse = await fetch(`${API_URL}/api/analyze-drawings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(drawingPaths)
+    });
+    console.log('📥 Drawing response status:', drawingResponse.status);
+    const drawingResult = await drawingResponse.json();
+    console.log('✅ Drawing result:', drawingResult);
     
     // 2. Analyze clinical data
-      const clinicalResponse = await fetch(`${API_URL}/api/analyze-clinical`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(patientData)
-      });
-      const clinicalResult = await clinicalResponse.json();
+    console.log('📤 Sending clinical data...');
+    const clinicalResponse = await fetch(`${API_URL}/api/analyze-clinical`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(patientData)
+    });
+    console.log('📥 Clinical response status:', clinicalResponse.status);
+    const clinicalResult = await clinicalResponse.json();
+    console.log('✅ Clinical result:', clinicalResult);
     
     // 3. Get combined analysis
-      const combinedResponse = await fetch(`${API_URL}/api/analyze-combined`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          drawingPrediction: drawingResult,
-          clinicalPrediction: clinicalResult
-        })
-      });
-      const combinedResult = await combinedResponse.json();
+    console.log('📤 Sending combined data...');
+    const combinedResponse = await fetch(`${API_URL}/api/analyze-combined`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        drawingPrediction: drawingResult,
+        clinicalPrediction: clinicalResult
+      })
+    });
+    console.log('📥 Combined response status:', combinedResponse.status);
+    const combinedResult = await combinedResponse.json();
+    console.log('✅ Combined result:', combinedResult);
     
-      // Use real results
-      const newAssessment = {
-        id: combinedResult.assessment_id,
-        date: new Date().toISOString(),
-        result: combinedResult.result,
-        confidence: combinedResult.confidence,
-        drawingScore: drawingResult.confidence,
-        clinicalScore: clinicalResult.confidence,
-        patientData: { ...patientData }
-      };
+    // Use real results
+    const newAssessment = {
+      id: combinedResult.assessment_id,
+      date: new Date().toISOString(),
+      result: combinedResult.result,
+      confidence: combinedResult.confidence,
+      drawingScore: drawingResult.confidence,
+      clinicalScore: clinicalResult.confidence,
+      patientData: { ...patientData }
+    };
     
-      setResults(newAssessment);
-      setAssessmentHistory(prev => [newAssessment, ...prev]);
-      setScreen('results');
+    console.log('📊 Final assessment:', newAssessment);
     
-    } catch (error) {
-      console.error('API Error:', error);
-      alert('Failed to analyze. Please check your connection.');
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
+    setResults(newAssessment);
+    setAssessmentHistory(prev => [newAssessment, ...prev]);
+    setScreen('results');
+    console.log('🎉 Screen changed to results');
+    
+  } catch (error) {
+    console.error('❌ API Error:', error);
+    console.error('Error stack:', error.stack);
+    alert('Failed to analyze. Error: ' + error.message);
+  } finally {
+    console.log('🔄 Setting isAnalyzing to false');
+    setIsAnalyzing(false);
+  }
+};
 
   const generatePDF = async (assessment) => {
     alert(`PDF Report generated for Assessment ID: ${assessment.id}\n\nIn production, this would download a PDF file with complete medical report.`);
