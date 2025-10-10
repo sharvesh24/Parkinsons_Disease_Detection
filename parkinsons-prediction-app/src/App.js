@@ -131,7 +131,10 @@ const ParkinsonsApp = () => {
   const getCompletedPatterns = () => {
     return Object.values(drawingPaths).filter(path => path.length > 0).length;
   };
-
+  const canAnalyze = () => {
+    return getCompletedPatterns() > 0 && patientData.age && patientData.gender;
+  };
+    
   const analyzeData = async () => {
   console.log('🟢 analyzeData function called!');
   console.log('Can analyze?', canAnalyze());
