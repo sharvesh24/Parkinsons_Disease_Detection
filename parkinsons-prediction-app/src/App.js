@@ -1505,7 +1505,7 @@ const ParkinsonsApp = () => {
             }}>
               <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>About This App</h3>
               <p style={{ fontSize: '14px', color: theme.textSecondary, lineHeight: '1.6', margin: 0 }}>
-                NeuroCheck is an AI-powered screening tool designed to assist in early detection of Parkinson's disease. 
+                NeuroMate is an AI-powered screening tool designed to assist in early detection of Parkinson's disease. 
                 The app combines motor assessment through drawing analysis with clinical risk factor evaluation to provide 
                 a comprehensive screening result.
               </p>
