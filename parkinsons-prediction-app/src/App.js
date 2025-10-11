@@ -159,12 +159,12 @@ const ParkinsonsApp = () => {
     console.log('✅ Drawing result:', drawingResult);
     
     // 2. Analyze clinical data
-    console.log('📤 Sending clinical data...');
-    const clinicalResponse = await fetch(`${API_URL}/api/analyze-clinical`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(patientData)
-    });
+console.log('📤 Sending clinical data...');
+const clinicalResponse = await fetch(`${API_URL}/api/analyze-clinical`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(patientData)  // ← This already includes writingHand!
+});
     console.log('📥 Clinical response status:', clinicalResponse.status);
     const clinicalResult = await clinicalResponse.json();
     console.log('✅ Clinical result:', clinicalResult);
