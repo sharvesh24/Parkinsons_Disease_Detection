@@ -293,80 +293,138 @@ class ParkinsonPredictor:
             self.models_loaded = False
     
     def extract_drawing_features(self, coordinates_dict):
-        features = []
-        pattern_quality = {}
+    """
+    Extract features matching the RF model training data:
+    - RMS (root mean square deviation from template)
+    - MAX_BETWEEN_ET_HT (max radius difference)
+    - MIN_BETWEEN_ET_HT (min radius difference)
+    - STD_DEVIATION_ET_HT (std of radius difference)
+    - MRT (mean relative tremor)
+    - MAX_HT, MIN_HT, STD_HT (handwritten trace stats)
+    - CHANGES_FROM_NEGATIVE_TO_POSITIVE_BETWEEN_ET_HT
+    """
+    features = []
+    pattern_quality = {}
     
-        try:
-            for pattern_name in ['circle', 'spiral', 'meander']:
-                coords = coordinates_dict.get(pattern_name, [])
-                pattern_features = []
+    try:
+        for pattern_name in ['circle', 'spiral', 'meander']:
+            coords = coordinates_dict.get(pattern_name, [])
             
-                if coords and len(coords) > 2:
-                    # FIX: Handle both {x, y} objects and [x, y] arrays
-                    if isinstance(coords[0], dict):
-                        coords_array = np.array([[c['x'], c['y']] for c in coords])
-                    else:
-                        coords_array = np.array(coords)
-                
-                    x_coords, y_coords = coords_array[:, 0], coords_array[:, 1]
-                
-                    pattern_features.extend([
-                        np.mean(x_coords), np.mean(y_coords),
-                        np.std(x_coords), np.std(y_coords),
-                        np.ptp(x_coords), np.ptp(y_coords),
-                        len(coords)
-                    ])
-                
-                    if len(coords_array) > 2:
-                        velocity = np.diff(coords_array, axis=0)
-                        velocity_mag = np.sqrt(np.sum(velocity**2, axis=1))
-                    
-                        pattern_features.extend([
-                            np.mean(velocity_mag), np.std(velocity_mag),
-                            np.max(velocity_mag), np.min(velocity_mag)
-                        ])
-                    
-                        if len(velocity) > 1:
-                            accel = np.diff(velocity, axis=0)
-                            accel_mag = np.sqrt(np.sum(accel**2, axis=1))
-                            pattern_features.extend([np.mean(accel_mag), np.std(accel_mag)])
-                        
-                            if len(accel) > 1:
-                                jerk = np.diff(accel, axis=0)
-                                jerk_mag = np.sqrt(np.sum(jerk**2, axis=1))
-                                pattern_features.extend([np.mean(jerk_mag), np.std(jerk_mag)])
-                            else:
-                                pattern_features.extend([0, 0])
-                        else:
-                            pattern_features.extend([0, 0, 0, 0])
-                    
-                        pattern_quality[pattern_name] = {
-                            'completeness': min(1.0, len(coords) / 50),
-                            'smoothness': 1 - min(1, np.std(velocity_mag) / max(np.mean(velocity_mag), 0.01))
-                        }
-                    else:
-                        pattern_features.extend([0] * 8)
-                        pattern_quality[pattern_name] = {'completeness': 0, 'smoothness': 0}
-                else:
-                    pattern_features.extend([0] * 15)
-                    pattern_quality[pattern_name] = {'completeness': 0, 'smoothness': 0}
+            if not coords or len(coords) < 5:
+                # Not enough data - append zeros
+                features.extend([0] * 8)  # 8 features per pattern
+                pattern_quality[pattern_name] = {'completeness': 0, 'smoothness': 0}
+                continue
             
-                features.extend(pattern_features)
-        
-            target_size = 60
-            if len(features) < target_size:
-                features.extend([0.0] * (target_size - len(features)))
+            # Convert to numpy array
+            if isinstance(coords[0], dict):
+                coords_array = np.array([[c['x'], c['y']] for c in coords])
             else:
-                features = features[:target_size]
+                coords_array = np.array(coords)
+            
+            # Calculate center of drawing
+            center_x = np.mean(coords_array[:, 0])
+            center_y = np.mean(coords_array[:, 1])
+            
+            # Calculate radius from center for each point (HT - Handwritten Trace)
+            ht_radius = np.sqrt((coords_array[:, 0] - center_x)**2 + 
+                               (coords_array[:, 1] - center_y)**2)
+            
+            # Expected radius (ET - Exam Template) based on pattern type
+            if pattern_name == 'circle':
+                # For circle, expected radius is constant (mean of actual radius)
+                et_radius = np.ones_like(ht_radius) * np.mean(ht_radius)
+            elif pattern_name == 'spiral':
+                # For spiral, radius increases linearly
+                et_radius = np.linspace(np.min(ht_radius), np.max(ht_radius), len(ht_radius))
+            else:  # meander/wave
+                # For meander, radius varies sinusoidally
+                angles = np.linspace(0, 4*np.pi, len(ht_radius))
+                et_radius = np.mean(ht_radius) + 0.3 * np.mean(ht_radius) * np.sin(angles)
+            
+            # Calculate differences between ET and HT
+            diff_et_ht = et_radius - ht_radius
+            
+            # 1. RMS (Root Mean Square)
+            rms = np.sqrt(np.mean(diff_et_ht**2))
+            
+            # 2. MAX_BETWEEN_ET_HT
+            max_diff = np.max(np.abs(diff_et_ht))
+            
+            # 3. MIN_BETWEEN_ET_HT
+            min_diff = np.min(np.abs(diff_et_ht))
+            
+            # 4. STD_DEVIATION_ET_HT
+            std_diff = np.std(diff_et_ht)
+            
+            # 5. MRT (Mean Relative Tremor)
+            velocity = np.diff(ht_radius)
+            mrt = np.mean(np.abs(velocity)) / np.mean(ht_radius) if np.mean(ht_radius) > 0 else 0
+            
+            # 6. MAX_HT
+            max_ht = np.max(ht_radius)
+            
+            # 7. MIN_HT
+            min_ht = np.min(ht_radius)
+            
+            # 8. STD_HT
+            std_ht = np.std(ht_radius)
+            
+            # 9. CHANGES_FROM_NEGATIVE_TO_POSITIVE
+            sign_changes = np.sum(np.diff(np.sign(diff_et_ht)) != 0)
+            
+            # Append features for this pattern
+            pattern_features = [
+                float(rms),
+                float(max_diff),
+                float(min_diff),
+                float(std_diff),
+                float(mrt),
+                float(max_ht),
+                float(min_ht),
+                float(std_ht),
+                float(sign_changes)
+            ]
+            
+            # Replace NaN/Inf with 0
+            pattern_features = [f if np.isfinite(f) else 0.0 for f in pattern_features]
+            
+            features.extend(pattern_features)
+            
+            # Pattern quality metrics
+            completeness = min(1.0, len(coords) / 50)
+            smoothness = 1 - min(1.0, rms / max(np.mean(ht_radius), 1))
+            
+            pattern_quality[pattern_name] = {
+                'completeness': float(completeness),
+                'smoothness': float(smoothness),
+                'rms': float(rms),
+                'tremor': float(mrt)
+            }
+            
+            logger.info(f"✓ {pattern_name}: RMS={rms:.2f}, MRT={mrt:.3f}, completeness={completeness:.2f}")
         
-            features = [float(f) if np.isfinite(f) else 0.0 for f in features]
-        except Exception as e:
-            logger.error(f"Feature extraction error: {e}")
-            traceback.print_exc()  # Add full traceback
-            features = [0.0] * 60
-            pattern_quality = {'circle': {'completeness': 0}, 'spiral': {'completeness': 0}, 
-                             'meander': {'completeness': 0}}
-    
+        # Total features should be 3 patterns × 9 features = 27
+        # Pad or trim to match expected size
+        target_size = 27
+        if len(features) < target_size:
+            features.extend([0.0] * (target_size - len(features)))
+        else:
+            features = features[:target_size]
+        
+        logger.info(f"Final feature vector: {len(features)} features")
+        
+        return np.array(features).reshape(1, -1), pattern_quality
+        
+    except Exception as e:
+        logger.error(f"Feature extraction error: {e}")
+        logger.error(traceback.format_exc())
+        features = [0.0] * 27
+        pattern_quality = {
+            'circle': {'completeness': 0, 'smoothness': 0}, 
+            'spiral': {'completeness': 0, 'smoothness': 0}, 
+            'meander': {'completeness': 0, 'smoothness': 0}
+        }
         return np.array(features).reshape(1, -1), pattern_quality
     
     def analyze_drawings(self, coordinates_dict):
@@ -407,24 +465,54 @@ class ParkinsonPredictor:
             return {'prediction': 0, 'confidence': 0.5, 'error': str(e)}
     
     def heuristic_drawing_analysis(self, features, pattern_quality):
-        risk_indicators = []
-        
-        if len(features) > 16 and features[16] > 0.5:
-            risk_indicators.append(0.4)
-        
-        avg_completeness = np.mean([v['completeness'] for v in pattern_quality.values()])
-        if avg_completeness < 0.6:
-            risk_indicators.append(0.3)
-        
-        avg_smoothness = np.mean([v.get('smoothness', 0.7) for v in pattern_quality.values()])
-        if avg_smoothness < 0.5:
-            risk_indicators.append(0.3)
-        
-        risk_score = np.mean(risk_indicators) if risk_indicators else 0.15
-        prediction = 1 if risk_score > 0.4 else 0
-        confidence = 0.65 + abs(risk_score - 0.4) * 0.7
-        
-        return prediction, min(0.95, confidence)
+    """Enhanced heuristic using RF-style features"""
+    risk_indicators = []
+    
+    # Extract RMS values for each pattern (indices 0, 9, 18)
+    circle_rms = features[0] if len(features) > 0 else 0
+    spiral_rms = features[9] if len(features) > 9 else 0
+    meander_rms = features[18] if len(features) > 18 else 0
+    
+    # High RMS indicates poor template matching (Parkinson's symptom)
+    avg_rms = np.mean([circle_rms, spiral_rms, meander_rms])
+    
+    if avg_rms > 15:  # High RMS threshold
+        risk_indicators.append(0.7)
+    elif avg_rms > 8:
+        risk_indicators.append(0.4)
+    else:
+        risk_indicators.append(0.1)
+    
+    # Check MRT (Mean Relative Tremor) - indices 4, 13, 22
+    circle_mrt = features[4] if len(features) > 4 else 0
+    spiral_mrt = features[13] if len(features) > 13 else 0
+    meander_mrt = features[22] if len(features) > 22 else 0
+    
+    avg_mrt = np.mean([circle_mrt, spiral_mrt, meander_mrt])
+    
+    if avg_mrt > 0.15:  # High tremor
+        risk_indicators.append(0.6)
+    elif avg_mrt > 0.08:
+        risk_indicators.append(0.3)
+    
+    # Check pattern completeness
+    avg_completeness = np.mean([v['completeness'] for v in pattern_quality.values()])
+    if avg_completeness < 0.4:
+        risk_indicators.append(0.5)
+    
+    # Calculate risk score
+    risk_score = np.mean(risk_indicators) if risk_indicators else 0.2
+    
+    prediction = 1 if risk_score > 0.45 else 0
+    
+    # Confidence based on certainty
+    distance_from_threshold = abs(risk_score - 0.45)
+    confidence = 0.60 + (distance_from_threshold * 1.3)
+    confidence = min(0.92, max(0.58, confidence))
+    
+    logger.info(f"Heuristic: avg_rms={avg_rms:.2f}, avg_mrt={avg_mrt:.3f}, risk={risk_score:.3f}, pred={prediction}, conf={confidence:.3f}")
+    
+    return prediction, confidence
     
     def create_drawing_image(self, coordinates_dict, size=(128, 128)):
         image = np.ones((size[1], size[0], 3), dtype=np.uint8) * 255
@@ -497,27 +585,21 @@ class ParkinsonPredictor:
             logger.error(f"Clinical analysis error: {e}")
             return {'prediction': 0, 'confidence': 0.5, 'error': str(e)}
     
-    def create_clinical_features(self, age, gender, weight, height, smoker):
-        features = [age, 1 if gender == 'male' else 0, weight, height, 1 if smoker else 0]
-        bmi = weight / ((height/100) ** 2) if height > 0 else 25
-        features.append(bmi)
-        features.extend([1 if age >= t else 0 for t in [40, 50, 60, 70, 80]])
-        return np.array(features).reshape(1, -1)
+    def create_clinical_features(self, age, gender, weight, height, smoker, handedness='right'):
+    """
+    Create features EXACTLY matching RF model training:
+    Assuming RF model expects: [age, gender(M=1/F=0), handedness(R=1/L=0)]
+    Plus drawing features are added separately
+    """
+    features = [
+        float(age),
+        1.0 if gender.lower() == 'male' else 0.0,
+        1.0 if handedness.lower() == 'right' else 0.0
+    ]
     
-    def evidence_based_assessment(self, age, gender, smoker):
-        if age < 40:
-            age_risk = 0.01
-        elif age < 60:
-            age_risk = 0.1
-        elif age < 80:
-            age_risk = 0.3
-        else:
-            age_risk = 0.5
-        
-        risk = age_risk * (1.3 if gender == 'male' else 1.0) * (0.95 if smoker else 1.0)
-        prediction = 1 if risk > 0.3 else 0
-        confidence = 0.65 + min(0.3, abs(risk - 0.3) * 2)
-        return prediction, confidence
+    logger.info(f"Clinical features created: age={age}, gender={gender}, handedness={handedness}")
+    
+    return np.array(features).reshape(1, -1)
     
     def analyze_risk_factors(self, age, gender, bmi, smoker):
         return {
@@ -642,26 +724,51 @@ def analyze_drawings():
 
 @app.route('/api/analyze-clinical', methods=['POST'])
 @rate_limit
-def analyze_clinical():
+def analyze_clinical(self, patient_data):
     try:
-        data = request.json
-        if not data or not data.get('age') or not data.get('gender'):
-            return jsonify({'error': 'Missing required fields', 'status': 'error'}), 400
+        age = float(patient_data.get('age', 0))
+        gender = patient_data.get('gender', 'unknown').lower()
+        weight = float(patient_data.get('weight', 70)) if patient_data.get('weight') else 70
+        height = float(patient_data.get('height', 170)) if patient_data.get('height') else 170
+        smoker = bool(patient_data.get('smoker', False))
+        handedness = patient_data.get('writingHand', 'right')  # ← Use frontend's writingHand
         
-        result = predictor.analyze_clinical(data)
+        logger.info(f"Clinical data received: age={age}, gender={gender}, handedness={handedness}")
         
-        return jsonify({
-            'assessment_id': str(uuid.uuid4()),
-            'result': result['prediction'],
-            'confidence': result['confidence'],
-            'bmi': result.get('bmi'),
-            'risk_factors': result.get('risk_factors', {}),
-            'status': 'success',
-            'timestamp': datetime.now().isoformat()
-        })
+        features = self.create_clinical_features(age, gender, weight, height, smoker, handedness)
+        
+        prediction = 0
+        confidence = 0.5
+        
+        # Try using RF model if loaded
+        if all(models.get(m) for m in ['rf_model', 'scaler', 'pca']):
+            try:
+                logger.info(f"Using RF model with features: {features}")
+                features_scaled = models['scaler'].transform(features)
+                features_pca = models['pca'].transform(features_scaled)
+                prediction = models['rf_model'].predict(features_pca)[0]
+                pred_proba = models['rf_model'].predict_proba(features_pca)[0]
+                confidence = float(np.max(pred_proba))
+                logger.info(f"RF prediction: {prediction}, confidence: {confidence:.3f}")
+            except Exception as e:
+                logger.error(f"RF model failed: {e}, falling back to heuristic")
+                prediction, confidence = self.evidence_based_assessment(age, gender, smoker)
+        else:
+            logger.warning("RF model not available, using heuristic")
+            prediction, confidence = self.evidence_based_assessment(age, gender, smoker)
+        
+        bmi = weight / ((height/100) ** 2) if height > 0 else None
+        
+        return {
+            'prediction': int(prediction),
+            'confidence': float(confidence),
+            'bmi': bmi,
+            'risk_factors': self.analyze_risk_factors(age, gender, bmi, smoker)
+        }
     except Exception as e:
-        logger.error(f"Clinical error: {e}")
-        return jsonify({'error': str(e), 'status': 'error'}), 500
+        logger.error(f"Clinical analysis error: {e}")
+        traceback.print_exc()
+        return {'prediction': 0, 'confidence': 0.5, 'error': str(e)}
 
 @app.route('/api/analyze-combined', methods=['POST'])
 @rate_limit
